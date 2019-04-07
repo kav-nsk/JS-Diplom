@@ -1,6 +1,4 @@
-//export {Level};
 'use strict';
-
 
 class Vector {
     constructor(x, y) {
@@ -11,6 +9,7 @@ class Vector {
         this.x = x;
         this.y = y;
     };
+
     plus(obj) {
         if (!(obj instanceof Vector)) {
             throw new SyntaxError('Можно прибавлять к вектору только вектор типа Vector');
@@ -18,6 +17,7 @@ class Vector {
             return new Vector(this.x + obj.x, this.y + obj.y);
         };
     };
+
     times(multi) {
         return new Vector(this.x * multi, this.y * multi);
     };
@@ -304,8 +304,8 @@ class LevelParser {
 
 class Fireball extends Actor{
     constructor(pos, speed) {
-        super(pos, undefined, speed);
-        if (pos == undefined) {
+        super(pos, undefined, speed);       // Передлать. Попробовать  new Vector(x: 1, y: 1),
+        if (pos == undefined) {             // или вовсе не указывать. т.к. по умолчанию создается размером 1х1.
             this.pos.x = 0;
             this.pos.y = 0;
         };
@@ -324,7 +324,7 @@ class Fireball extends Actor{
 
     getNextPosition(t) {
         let time;
-        if (t == undefined) {
+        if (t == undefined) {           // Переделать на тринарный оператор.
             time = 1;
         } else {
             time = t;
@@ -343,11 +343,65 @@ class Fireball extends Actor{
 
     act(t, gameArea) {
         let nextPos = this.getNextPosition(t);
-        if (gameArea.obstacleAt(nextPos, this.size) == undefined) {
+        if (gameArea.obstacleAt(nextPos, this.size) == undefined) { // Переделать на тринарный оператор.
             this.pos = nextPos;
         } else {
             this.handleObstacle();
-        }
+        };
     };
 }
 
+
+class HorizontalFireball extends Fireball {
+    constructor(pos) {
+        super(pos, new Vector(2, 0));
+    };
+}
+
+
+class VerticalFireball extends Fireball {
+    constructor(pos) {
+        super(pos, new Vector(0, 2));
+    };
+}
+
+
+class FireRain  extends Fireball {
+    constructor(pos) {
+        super(pos, new Vector(0, 3));
+        this.firstPos = pos;
+    };
+
+    handleObstacle() {
+        if (this.pos != this.firstPos) {
+            this.pos = this.firstPos;
+        };
+        this.speed = this.speed.times(1);
+    };
+
+/*  А чем обрабатывать столкновение с объектом?
+    act(t, gameArea) {
+        let nextPos = this.getNextPosition(t);
+        if (gameArea.obstacleAt(nextPos, this.size) == undefined) {
+            this.pos = nextPos;
+        } else {
+            this.pos = this.firstPos;
+        };
+    };
+    */
+}
+
+
+class Coin extends Actor {
+    constructor(pos) {
+        super(pos, new Vector(0.6, 0.6), );
+        this.pos = this.pos.plus(new Vector(0.2, 0.1));
+        this.springSpeed = 8;
+        this.springDist = 0.07;
+        this.spring = Math.random() * 2 * Math.PI;
+    };
+
+    get type() {
+        return 'coin';
+    }
+}
