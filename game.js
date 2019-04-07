@@ -298,5 +298,56 @@ class LevelParser {
         let listMoveObj = this.createActors(plan);
         let gameArea = new Level(listStaticObj, listMoveObj);
         return gameArea;
-    }
+    };
 }
+
+
+class Fireball extends Actor{
+    constructor(pos, speed) {
+        super(pos, undefined, speed);
+        if (pos == undefined) {
+            this.pos.x = 0;
+            this.pos.y = 0;
+        };
+        if (speed == undefined) {
+            this.speed.x = 0;
+            this.speed.y = 0;
+        };
+
+        this.size.x = 1;
+        this.size.y = 1;
+    };
+
+    get type() {
+        return 'fireball';
+    };
+
+    getNextPosition(t) {
+        let time;
+        if (t == undefined) {
+            time = 1;
+        } else {
+            time = t;
+        };
+        if (this.speed.x == 0 && this.speed.y == 0) {
+            return new Vector(this.pos.x, this.pos.y);
+        } else {
+            let result = new Vector(this.pos.x, this.pos.y).plus(new Vector(this.speed.x, this.speed.y).times(time));
+            return result;
+        };
+    };
+
+    handleObstacle() {
+        this.speed = this.speed.times(-1);
+    };
+
+    act(t, gameArea) {
+        let nextPos = this.getNextPosition(t);
+        if (gameArea.obstacleAt(nextPos, this.size) == undefined) {
+            this.pos = nextPos;
+        } else {
+            this.handleObstacle();
+        }
+    };
+}
+
