@@ -1,4 +1,6 @@
+//export {Level};
 'use strict';
+
 
 class Vector {
     constructor(x, y) {
@@ -228,4 +230,73 @@ class Level {
         };
     };
 
+}
+
+class LevelParser {
+    constructor(listObjGameArea) {
+        this.listObjGameArea = listObjGameArea;
+    };
+
+    actorFromSymbol(symb) {
+        if (symb != undefined && symb in this.listObjGameArea) {
+            return this.listObjGameArea[symb];
+        } else {
+            return undefined;
+        };
+    };
+
+    obstacleFromSymbol(symb) {
+        if (symb == 'x') {
+            return 'wall';
+        };
+        if (symb == '!') {
+            return 'lava';
+        };
+        return undefined;
+    };
+
+    createGrid(plan) {
+        if (plan.length == 0) {
+            return [];
+        } else {
+            let resultList = new Array();
+            for (let i of plan) {
+                let newlist = new Array();
+                for (let j = 0; j < i.length; j++) {
+                    newlist[j] = this.obstacleFromSymbol(i[j]);
+                };
+                resultList.push(newlist);
+            };
+            return resultList;
+        };
+    };
+
+    createActors(listObj) {
+        if (listObj.length == 0 || this.listObjGameArea == undefined) {
+            return [];
+        } else {
+            let listMoveObj = new Array();
+            for (let i = 0; i < listObj.length; i++) {
+                for (let j = 0; j < listObj[i].length; j++) {
+                    let symb = listObj[i][j];
+                    let actor = this.actorFromSymbol(symb);
+                    if ((actor != undefined) && (actor instanceof Function) && (actor.prototype.__proto__.constructor.name == 'Actor' ||
+                    actor.prototype.constructor.name == 'Actor')) {
+                        let obj = new Object (new actor);
+                        obj.pos.x = j;
+                        obj.pos.y = i;
+                        listMoveObj.push(obj);
+                    };
+                };
+            };
+        return listMoveObj;
+        };
+    };
+
+    parse(plan) {
+        let listStaticObj = this.createGrid(plan);
+        let listMoveObj = this.createActors(plan);
+        let gameArea = new Level(listStaticObj, listMoveObj);
+        return gameArea;
+    }
 }
