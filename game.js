@@ -106,8 +106,8 @@ class Actor {
 }
 
 class Level {
-    constructor(grid, listActorsObj) {
-        this.grid = grid;
+    constructor(area, listActorsObj) {
+        this.grid = area;
         this.actors = listActorsObj;
         this.status = null;
         this.finishDelay = 1;
@@ -121,10 +121,10 @@ class Level {
         }
 
          // Получаем параметры высоты и ширины игрового поля.
-        if (grid != undefined && grid.length != 0) {
-            this.height = grid.length;   
+        if (area != undefined && area.length != 0) {
+            this.height = area.length;   
             this.width = 0;
-            for (let i of grid) {
+            for (let i of area) {
                 if (i != undefined && i.length > this.width) {
                     this.width = i.length;
                 }
@@ -179,8 +179,8 @@ class Level {
                 return 'wall';
             }
             // Проверка пересечений стен и лав:
-            for (let x = Math.ceil(pos.x); x <= distObj.x; x++) {
-                for (let y = Math.ceil(pos.y); y <= distObj.y; y++) {
+            for (let x = (pos.x); x <= distObj.x; x++) {
+                for (let y = (pos.y); y <= distObj.y; y++) {
                     if (this.grid[x][y] == 'lava') {
                         return 'lava';
                     }
@@ -279,18 +279,19 @@ class LevelParser {
             for (let i = 0; i < listObj.length; i++) {
                 for (let j = 0; j < listObj[i].length; j++) {
                     let symb = listObj[i][j];
-                    let actor = this.actorFromSymbol(symb);
-                    if ((actor != undefined) && (actor instanceof Function) && (actor.prototype.__proto__.constructor.name == 'Actor' ||
-                    actor.prototype.constructor.name == 'Actor')) {
-                      	let obj = new Object (new actor);
-                        obj.pos.x = j;
-                        obj.pos.y = i;
-                        listMoveObj.push(obj);
+                    let actorClass = this.actorFromSymbol(symb);
+                    if (actorClass != undefined && actorClass instanceof Function) {
+                        let newMoveObj = new Object (new actorClass());
+                        if (newMoveObj instanceof Actor) {
+                            newMoveObj.pos.x = j;
+                            newMoveObj.pos.y = i;
+                            listMoveObj.push(newMoveObj);
+                        }
                     }
                 }
             }
         return listMoveObj;
-        }
+    }
     }
 
     parse(plan) {
@@ -308,6 +309,7 @@ class Fireball extends Actor{
     }
 
     get type() {
+        let xxx = new HorizontalFireball();
         return 'fireball';
     }
 
@@ -359,17 +361,6 @@ class FireRain  extends Fireball {
         }
         this.speed = this.speed.times(1);
     }
-
-/*  А чем обрабатывать столкновение с объектом?
-    act(t, gameArea) {
-        let nextPos = this.getNextPosition(t);
-        if (gameArea.obstacleAt(nextPos, this.size) == undefined) {
-            this.pos = nextPos;
-        } else {
-            this.pos = this.firstPos;
-        };
-    };
-    */
 }
 
 
@@ -421,3 +412,33 @@ class Player extends Actor {
         return 'player';
     }
 }
+
+
+const schema = [
+    '    v    ',
+    '         ',
+    '         ',
+    '       oo',
+    '=    !xxx',
+    ' @     | ',
+    'xxx!     ',
+    '         '
+];
+
+const actorDict = {
+'@': Player,
+'v': FireRain,
+'o': Coin,
+'|': VerticalFireball,
+'=': HorizontalFireball
+}
+const parser = new LevelParser(actorDict);
+const level = parser.parse(schema);
+console.log(level.grid);
+//new DOMDisplay(document.body, level); // В readme ошибка, здесь нужно добавить new.
+//new DOMDisplay(document.body);
+runLevel(level, DOMDisplay)
+  .then(status => console.log(`Игрок ${status}`));
+//runLevel(level, DOMDisplay);
+//runGame(schemas, parser, DOMDisplay)
+//    .then(() => console.log('Вы выиграли приз!'));
