@@ -186,7 +186,11 @@ class Level {
                             return this.grid[yGrid][xGrid];
                         }
                         // Соприкосновение объекта с разных сторон препятствия или вложение (пересечение) его.
-                        if ((xGrid >= pos.x && xGrid + 1 <= distObj.x)) {
+                        if ((xGrid >= pos.x && xGrid + 1 <= distObj.x && yGrid >= pos.y && yGrid + 1 <= distObj.y) ||                                       //вложение
+                        (xGrid < distObj.x && xGrid + 1 > pos.x && yGrid <= pos.y && yGrid + 1 >= distObj.y) || // подход объекта слева
+                        (xGrid + 1 > pos.x && xGrid < pos.x && yGrid <= pos.y && yGrid + 1 >= distObj.y) ||     // подход объекта справа
+                        (yGrid < distObj.y && yGrid + 1 > distObj.y && xGrid <= pos.x && xGrid + 1 >= distObj.x) || // подход сверху к препятствию
+                        (yGrid + 1 > pos.y && yGrid < pos.y && xGrid <= pos.x && xGrid + 1 >= distObj.x)) {         // подход снизу
                             return this.grid[yGrid][xGrid];
                         }
                     }
@@ -331,9 +335,9 @@ class Fireball extends Actor{
         this.speed = this.speed.times(-1);
     }
 
-    act(t, gameArea) {
+    act(t, gameLevel) {
         let nextPos = this.getNextPosition(t);
-        (gameArea.obstacleAt(nextPos, this.size) == undefined) ? this.pos = nextPos : this.handleObstacle();
+        (gameLevel.obstacleAt(nextPos, this.size) == undefined) ? this.pos = nextPos : this.handleObstacle();
     }
 }
 
@@ -418,24 +422,24 @@ class Player extends Actor {
 
 
 const schemas = [
-    ['    v    ',
-    '         ',
+    ['        @',
+    '  |      ',
     '         ',
     '       oo',
-    '=    !xxx',
-    ' @     | ',
-    'xxx!     ',
+    '=     xxx',
+    '      |  ',
+    'xxx=     ',
     '         '],
     [
-        '      v  ',
-        '    v    ',
-        '  v      ',
-        '        o',
-        '        x',
-        '@   x    ',
-        'x        ',
-        '         '
-      ]
+    '      v  ',
+    '    v    ',
+    '  v      ',
+    '        o',
+    '        x',
+    '@   x    ',
+    'x        ',
+    '         '
+    ]
 ];
 
 const actorDict = {
