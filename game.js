@@ -165,27 +165,30 @@ class Level {
             throw new SyntaxError('Требуется объект типа Vector');
         } else {
             let distObj = pos.plus(objSize);
-            // Проверка выхода за боковые границы поля
-            if ((distObj.x < 1 && distObj.y >=1 && distObj.y <= this.height) ||
-            (distObj.x > this.width && distObj.y >=1 && distObj.y <= this.height)) {
+            // Проверка выхода за боковые и верхнюю границы поля.
+            if (pos.x < 0 || distObj.x > this.width || pos.y < 0) {
                 return 'wall';
             }
-            // Проверка выхода за нижнюю границу
+            // Проверка выхода за нижнюю границу.
             if (distObj.y > this.height) {
                 return 'lava';
             }
-            // Проверка выхода за верхнюю границу
-            if (distObj.y < 1) {
-                return 'wall';
-            }
-            // Проверка пересечений стен и лав:
-            for (let x = (pos.x); x <= distObj.x; x++) {
-                for (let y = (pos.y); y <= distObj.y; y++) {
-                    if (this.grid[x][y] == 'lava') {
-                        return 'lava';
-                    }
-                    if (this.grid[x][y] == 'wall') {
-                        return 'wall';
+            // Проверка на пересечение с преградами.
+            // Обходим массив игрового поля, при нахождении неподвижной перграды, проверяем переданный объект
+            // на нахождение внутри границ преграды или ее пересечение.
+            for (let yGrid = 0; yGrid < this.height; yGrid++) {
+                for (let xGrid = 0; xGrid < this.width; xGrid++) {
+                    if (this.grid[yGrid][xGrid] == 'wall' || this.grid[yGrid][xGrid] == 'lava') {
+        
+                        // Пересечение объекта с не целыми размерами или (и) позицией с преградой.
+                        if (((pos.y < yGrid + 1 && pos.y > yGrid) || (distObj.y < yGrid + 1 && distObj.y > yGrid)) &&
+                        ((pos.x < xGrid + 1 && pos.x > xGrid) || (distObj.x < xGrid + 1 && distObj.x > xGrid))) {
+                            return this.grid[yGrid][xGrid];
+                        }
+                        // Соприкосновение объекта с разных сторон препятствия или вложение (пересечение) его.
+                        if ((xGrid >= pos.x && xGrid + 1 <= distObj.x)) {
+                            return this.grid[yGrid][xGrid];
+                        }
                     }
                 }
             }
@@ -414,15 +417,25 @@ class Player extends Actor {
 }
 
 
-const schema = [
-    '    v    ',
+const schemas = [
+    ['    v    ',
     '         ',
     '         ',
     '       oo',
     '=    !xxx',
     ' @     | ',
     'xxx!     ',
-    '         '
+    '         '],
+    [
+        '      v  ',
+        '    v    ',
+        '  v      ',
+        '        o',
+        '        x',
+        '@   x    ',
+        'x        ',
+        '         '
+      ]
 ];
 
 const actorDict = {
@@ -433,12 +446,12 @@ const actorDict = {
 '=': HorizontalFireball
 }
 const parser = new LevelParser(actorDict);
-const level = parser.parse(schema);
-console.log(level.grid);
+//const level = parser.parse(schema);
+//console.log(level.grid);
 //new DOMDisplay(document.body, level); // В readme ошибка, здесь нужно добавить new.
 //new DOMDisplay(document.body);
-runLevel(level, DOMDisplay)
-  .then(status => console.log(`Игрок ${status}`));
+//runLevel(level, DOMDisplay)
+//  .then(status => console.log(`Игрок ${status}`));
 //runLevel(level, DOMDisplay);
-//runGame(schemas, parser, DOMDisplay)
-//    .then(() => console.log('Вы выиграли приз!'));
+runGame(schemas, parser, DOMDisplay)
+    .then(() => console.log('Вы выиграли приз!'));
