@@ -186,7 +186,7 @@ class Level {
                             return this.grid[yGrid][xGrid];
                         }
                         // Соприкосновение объекта с разных сторон препятствия или вложение (пересечение) его.
-                        if ((xGrid >= pos.x && xGrid + 1 <= distObj.x && yGrid >= pos.y && yGrid + 1 <= distObj.y) ||                                       //вложение
+                        if ((xGrid >= pos.x && xGrid + 1 <= distObj.x && yGrid >= pos.y && yGrid + 1 <= distObj.y) || // вложение                                      //вложение
                         (xGrid < distObj.x && xGrid + 1 > pos.x && yGrid <= pos.y && yGrid + 1 >= distObj.y) || // подход объекта слева
                         (xGrid + 1 > pos.x && xGrid < pos.x && yGrid <= pos.y && yGrid + 1 >= distObj.y) ||     // подход объекта справа
                         (yGrid < distObj.y && yGrid + 1 > distObj.y && xGrid <= pos.x && xGrid + 1 >= distObj.x) || // подход сверху к препятствию
@@ -422,7 +422,7 @@ class Player extends Actor {
 
 
 const schemas = [
-    ['        @',
+    ['    v   @',
     '  |      ',
     '         ',
     '       oo',
