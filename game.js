@@ -359,14 +359,11 @@ class VerticalFireball extends Fireball {
 class FireRain  extends Fireball {
     constructor(pos) {
         super(pos, new Vector(0, 3));
-        this.firstPos = pos;
+        this.firstPos = this.pos;
     }
 
     handleObstacle() {
-        if (this.pos != this.firstPos) {
-            this.pos = this.firstPos;
-        }
-        this.speed = this.speed.times(1);
+        this.pos = this.firstPos;
     }
 }
 
