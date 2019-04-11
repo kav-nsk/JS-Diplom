@@ -70,35 +70,25 @@ class Actor {
         } else if (objMove === this) {
             return false;
         }
+        
         // Игнорирование объектов с отрицательными размерами.
-        if ((objMove.size.x < 0 || objMove.size.y < 0) &&
-        ((objMove.left == this.left && objMove.bottom == this.bottom) || (objMove.right == this.right && objMove.top == this.top) ||
-        (objMove.left == this.left && objMove.top == this.top) || (objMove.bottom == this.bottom && objMove.right == this.right))) {
+        if (this.size.x < 0 || this.size.y < 0 || objMove.size.x < 0 || objMove.size.y < 0) {
+            console.log('negative');
             return false;
         }
-        if ((this.size.x < 0 || this.size.y < 0) &&
-        ((objMove.left == this.left && objMove.bottom == this.bottom) || (objMove.right == this.right && objMove.top == this.top) ||
-        (objMove.left == this.left && objMove.top == this.top) || (objMove.bottom == this.bottom && objMove.right == this.right))) {
-            return false;
-        }
-        // Расчет длины диагонали объектов.
-        let diagStatObj = Math.pow(this.size.x, 2) + Math.pow(this.size.y, 2);
-        let diagMoveObj = Math.pow(objMove.size.x, 2) + Math.pow(objMove.size.y, 2);
-        // Объекты одинаковы по размеру и расположены один над другим.
-        if ((diagStatObj == diagMoveObj) && (this.left == objMove.left)) {
+        // Один в другом.
+        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
+        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
+            console.log('inTo');
             return true;
         }
-        // Статичный больше подвижного и подвижный находится в нем.
-        if ((diagStatObj > diagMoveObj) && (objMove.left > this.left && objMove.right < this.right)) {
-            return true;
-        }
+        
         // Случаи частичного пересечения объектов.
-        if (((objMove.bottom >= this.bottom && objMove.bottom < this.top) && (objMove.left >= this.left && objMove.left < this.right)) ||
-        ((objMove.bottom >= this.bottom && objMove.bottom < this.top) && (objMove.right <= this.right && objMove.right > this.left)) ||
-        ((objMove.top <= this.top && objMove.top > this.bottom) && (objMove.left >= this.left && objMove.left < this.right)) ||
-        ((objMove.top <= this.top && objMove.top > this.bottom) && (objMove.right <= this.right && objMove.right > this.left)) ||
-        ((objMove.left >= this.left && objMove.left < this.right) && (objMove.top == this.top && objMove.bottom == this.bottom)) ||
-        ((objMove.right > this.left && objMove.right <= this.right) && (objMove.top == this.top && objMove.bottom == this.bottom))) {
+        if (((objMove.right > this.left && objMove.right <= this.right) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||  // подход переданного объекта слева
+        ((objMove.left < this.right && objMove.left >= this.left) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||         // подход переданного справа
+        ((objMove.bottom > this.top && objMove.bottom <= this.bottom) && (objMove.right > this.left && objMove.right <= this.right)) ||       // подход objMove сверху
+        ((objMove.top < this.bottom && objMove.top >= this.top) && (objMove.right > this.left && objMove.right <= this.right))) {            // подход objMove снизу
+            console.log('intersection');
             return true;
         }
         return false;
@@ -419,21 +409,21 @@ class Player extends Actor {
 
 
 const schemas = [
-    ['    v   @',
-    '  |      ',
+    ['    v    ',
+    '@        ',
     '         ',
     '       oo',
-    '=     xxx',
+    '      xxx',
     '      |  ',
-    'xxx=     ',
+    'xxx!     ',
     '         '],
     [
-    '      v  ',
-    '    v    ',
+    '    v v  ',
+    '         ',
     '  v      ',
     '        o',
-    '        x',
-    '@   x    ',
+    '@       x',
+    '    x    ',
     'x        ',
     '         '
     ]
