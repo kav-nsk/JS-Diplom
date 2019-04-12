@@ -70,32 +70,25 @@ class Actor {
         } else if (objMove === this) {
             return false;
         }
+        
         // Игнорирование объектов с отрицательными размерами.
-        if ((objMove.size.x < 0 || objMove.size.y < 0) &&
-        ((objMove.left == this.left && objMove.bottom == this.bottom) || (objMove.right == this.right && objMove.top == this.top) ||
-        (objMove.left == this.left && objMove.top == this.top) || (objMove.bottom == this.bottom && objMove.right == this.right))) {
+        if (this.size.x < 0 || this.size.y < 0 || objMove.size.x < 0 || objMove.size.y < 0) {
+            console.log('negative');
             return false;
         }
-        /*
-        if ((this.size.x < 0 || this.size.y < 0) &&
-        ((objMove.left == this.left && objMove.bottom == this.bottom) || (objMove.right == this.right && objMove.top == this.top) ||
-        (objMove.left == this.left && objMove.top == this.top) || (objMove.bottom == this.bottom && objMove.right == this.right))) {
-            return false;
-        }
-        // Расчет длины диагонали объектов.
-        let diagStatObj = Math.pow(this.size.x, 2) + Math.pow(this.size.y, 2);
-        let diagMoveObj = Math.pow(objMove.size.x, 2) + Math.pow(objMove.size.y, 2);
-        // Объекты одинаковы по размеру и расположены один над другим.
-        if ((diagStatObj == diagMoveObj) && (this.left == objMove.left)) {
+        // Один в другом.
+        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
+        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
+            console.log('inTo');
             return true;
         }
-        // Статичный больше подвижного и подвижный находится в нем.
-        if ((diagStatObj > diagMoveObj) && (objMove.left > this.left && objMove.right < this.right)) {
-            return true;
-        }*/
+        
         // Случаи частичного пересечения объектов.
-        if () {
-            console.log('BOOM!');
+        if (((objMove.right > this.left && objMove.right <= this.right) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||  // подход переданного объекта слева
+        ((objMove.left < this.right && objMove.left >= this.left) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||         // подход переданного справа
+        ((objMove.bottom > this.top && objMove.bottom <= this.bottom) && (objMove.right > this.left && objMove.right <= this.right)) ||       // подход objMove сверху
+        ((objMove.top < this.bottom && objMove.top >= this.top) && (objMove.right > this.left && objMove.right <= this.right))) {            // подход objMove снизу
+            console.log('intersection');
             return true;
         }
         return false;
@@ -219,22 +212,22 @@ class Level {
     playerTouched(typeObj, obj) {
         if (this.status == null) {
             if (typeObj == 'lava' || typeObj == 'fireball') {
-                console.log('DED!!!');
                 this.status = 'lost';
+                return;
             }
-            if (obj != undefined && typeObj == 'coin' && obj.type == typeObj) {
-                let delCoin = this.actors.indexOf(obj);
-                if (delCoin >= 0) {
-                    this.actors.splice(delCoin, 1);
-                    delCoin = this.actors.indexOf(obj);
-                    if (delCoin === -1) {
-                        this.status = 'won';
-                    }
+            if (obj != undefined && obj.type == 'coin') {
+            let delObj = this.actors.indexOf(obj);
+            this.actors.splice(delObj, 1);
+            for (let obj of this.actors) {
+                if (obj.type == 'coin') {
+                    return;
                 }
             }
+            this.status = 'won';
+            return;
         }
     }
-
+    }
 }
 
 class LevelParser {
@@ -417,21 +410,21 @@ class Player extends Actor {
 
 
 const schemas = [
-    ['@        ',
+    ['    v    ',
+    '@        ',
     '         ',
-    '         ',
-    '       oo',
-    '=     xxx',
-    '         ',
-    'xxx      ',
+    '      oo',
+    '      xxx',
+    ' oo   |  ',
+    'xxx!     ',
     '         '],
     [
-    '      v  ',
-    '    v    ',
+    '    v v  ',
+    '         ',
     '  v      ',
     '        o',
-    '        x',
-    '@   x    ',
+    '@       x',
+    '    x    ',
     'x        ',
     '         '
     ]
