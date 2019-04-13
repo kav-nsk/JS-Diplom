@@ -73,22 +73,23 @@ class Actor {
         
         // Игнорирование объектов с отрицательными размерами.
         if (this.size.x < 0 || this.size.y < 0 || objMove.size.x < 0 || objMove.size.y < 0) {
-            console.log('negative');
+            //console.log('negative');
             return false;
-        }
-        // Один в другом.
-        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
-        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
-            console.log('inTo');
-            return true;
         }
         
         // Случаи частичного пересечения объектов.
-        if (((objMove.right > this.left && objMove.right <= this.right) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||  // подход переданного объекта слева
-        ((objMove.left < this.right && objMove.left >= this.left) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||         // подход переданного справа
-        ((objMove.bottom > this.top && objMove.bottom <= this.bottom) && (objMove.right > this.left && objMove.right <= this.right)) ||       // подход objMove сверху
-        ((objMove.top < this.bottom && objMove.top >= this.top) && (objMove.right > this.left && objMove.right <= this.right))) {            // подход objMove снизу
-            console.log('intersection');
+        if (((objMove.right > this.left && objMove.right <= this.right) && ((objMove.bottom <= this.bottom && objMove.bottom > this.top) || (objMove.top >= this.top && objMove.top < this.bottom))) ||  // подход переданного объекта слева
+        ((objMove.left < this.right && objMove.left >= this.left) && ((objMove.bottom <= this.bottom && objMove.bottom > this.top) || (objMove.top >= this.top && objMove.top < this.bottom))) ||        // подход переданного справа
+        ((objMove.bottom > this.top && objMove.bottom <= this.bottom) && ((objMove.right > this.left && objMove.right <= this.right) || (objMove.left >= this.left && objMove.left < this.right))) ||    // подход objMove сверху
+        ((objMove.top < this.bottom && objMove.top >= this.top) && ((objMove.right > this.left && objMove.right <= this.right) || (objMove.left >= this.left && objMove.left < this.right)))) {          // подход objMove снизу
+            //console.log('intersection');
+            return true;
+        }
+
+        // Один в другом.
+        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
+        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
+            //console.log('inTo');
             return true;
         }
         return false;
@@ -170,7 +171,7 @@ class Level {
                 for (let xGrid = 0; xGrid < this.width; xGrid++) {
                     if (this.grid[yGrid][xGrid] == 'wall' || this.grid[yGrid][xGrid] == 'lava') {
         
-                        // Пересечение объекта с не целыми размерами или (и) позицией с преградой.
+                        // Пересечение объекта с не целыми размерами или(и) позицией с преградой.
                         if (((pos.y < yGrid + 1 && pos.y > yGrid) || (distObj.y < yGrid + 1 && distObj.y > yGrid)) &&
                         ((pos.x < xGrid + 1 && pos.x > xGrid) || (distObj.x < xGrid + 1 && distObj.x > xGrid))) {
                             return this.grid[yGrid][xGrid];
@@ -194,19 +195,14 @@ class Level {
     }
 
     noMoreActors(typeObj) {
-        let flagTypeObj = false;
         if (this.actors != undefined) {
-            for (let i of this.actors) {
-                if (i.type == typeObj) {
-                    flagTypeObj = true;
+            for (let obj of this.actors) {
+                if (obj.type == typeObj) {
+                    return false;
                 }
             }
         }
-        if (!flagTypeObj) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     playerTouched(typeObj, obj) {
@@ -218,13 +214,13 @@ class Level {
             if (obj != undefined && obj.type == 'coin') {
             let delObj = this.actors.indexOf(obj);
             this.actors.splice(delObj, 1);
+
             for (let obj of this.actors) {
                 if (obj.type == 'coin') {
                     return;
                 }
             }
             this.status = 'won';
-            return;
         }
     }
     }
@@ -410,20 +406,20 @@ class Player extends Actor {
 
 
 const schemas = [
-    ['    v    ',
+    ['  | v    ',
     '@        ',
     '         ',
     '      oo',
     '      xxx',
-    ' oo   |  ',
+    '         ',
     'xxx!     ',
     '         '],
     [
-    '    v v  ',
-    '         ',
+    '      v  ',
+    '    v    ',
     '  v      ',
     '        o',
-    '@       x',
+    '@      xx',
     '    x    ',
     'x        ',
     '         '
