@@ -78,10 +78,10 @@ class Actor {
         }
         
         // Случаи частичного пересечения объектов.
-        if (((objMove.right > this.left && objMove.right <= this.right) && ((objMove.bottom <= this.bottom && objMove.bottom > this.top) || (objMove.top >= this.top && objMove.top < this.bottom))) ||  // подход переданного объекта слева
-        ((objMove.left < this.right && objMove.left >= this.left) && ((objMove.bottom <= this.bottom && objMove.bottom > this.top) || (objMove.top >= this.top && objMove.top < this.bottom))) ||        // подход переданного справа
-        ((objMove.bottom > this.top && objMove.bottom <= this.bottom) && ((objMove.right > this.left && objMove.right <= this.right) || (objMove.left >= this.left && objMove.left < this.right))) ||    // подход objMove сверху
-        ((objMove.top < this.bottom && objMove.top >= this.top) && ((objMove.right > this.left && objMove.right <= this.right) || (objMove.left >= this.left && objMove.left < this.right)))) {          // подход objMove снизу
+        if ((((objMove.right > this.left && objMove.right <= this.right) || (objMove.left < this.right && objMove.left >= this.left)) &&
+        ((objMove.bottom <= this.bottom && objMove.bottom > this.top) || (objMove.top >= this.top && objMove.top < this.bottom))) ||  // подход переданного объекта слева и справа
+        (((objMove.bottom > this.top && objMove.bottom <= this.bottom) || (objMove.top < this.bottom && objMove.top >= this.top)) &&
+        ((objMove.right > this.left && objMove.right <= this.right) || (objMove.left >= this.left && objMove.left < this.right)))) {  // подход objMove снизу  и сверху
             //console.log('intersection');
             return true;
         }
