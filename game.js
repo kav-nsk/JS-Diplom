@@ -2,7 +2,7 @@
 
 class Vector {
     constructor(x, y) {
-        if (x == undefined && y == undefined) {
+        if (x === undefined && y === undefined) {
             x = 0;
             y = 0;
         }
@@ -30,7 +30,8 @@ class Actor {
             return obj instanceof Vector ? true : false;
         }
 
-        if (objPleace == undefined && objSize == undefined && objVelocity == undefined) {
+        if (objPleace === undefined && objSize === undefined &&
+            objVelocity === undefined) {
             this.pos = new Vector(0, 0);
             this.size =  new Vector(1, 1);
             this.speed = new Vector (0, 0);
@@ -40,9 +41,21 @@ class Actor {
             throw new SyntaxError('Требуется объект типа Vector');
         }
 
-        objPleace != undefined ? this.pos = objPleace : this.pos = new Vector(0, 0);
-        objSize != undefined ? this.size = objSize : this.size = new Vector(1, 1);
-        objVelocity != undefined ? this.speed = objVelocity : this.speed = new Vector(0, 0);
+        if (objPleace != undefined) {
+            this.pos = objPleace;
+        } else {
+            this.pos = new Vector(0, 0);
+        }
+        if (objSize != undefined) {
+            this.size = objSize;
+        } else {
+            this.size = new Vector(1, 1);
+        }
+        if (objVelocity != undefined) {
+            this.speed = objVelocity;
+        } else {
+            this.speed = new Vector(0, 0);
+        }
     }
 
     get left() {
@@ -72,24 +85,31 @@ class Actor {
         }
         
         // Игнорирование объектов с отрицательными размерами.
-        if (this.size.x < 0 || this.size.y < 0 || objMove.size.x < 0 || objMove.size.y < 0) {
-            console.log('negative');
+        if (this.size.x < 0 || this.size.y < 0 ||
+            objMove.size.x < 0 || objMove.size.y < 0) {
+            //console.log('negative');
             return false;
         }
         
         // Случаи частичного пересечения объектов.
-        if (((objMove.right > this.left && objMove.right <= this.right) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||  // подход переданного объекта слева
-        ((objMove.left < this.right && objMove.left >= this.left) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||         // подход переданного справа
-        ((objMove.bottom > this.top && objMove.bottom <= this.bottom) && (objMove.right > this.left && objMove.right <= this.right)) ||       // подход objMove сверху
-        ((objMove.top < this.bottom && objMove.top >= this.top) && (objMove.right > this.left && objMove.right <= this.right))) {            // подход objMove снизу
-            console.log('intersection');
+        if ((((objMove.right > this.left && objMove.right <= this.right) || // подход переданного
+        (objMove.left < this.right && objMove.left >= this.left)) &&        // объекта слева и справа
+        ((objMove.bottom <= this.bottom && objMove.bottom > this.top) ||
+        (objMove.top >= this.top && objMove.top < this.bottom))) ||  
+        (((objMove.bottom > this.top && objMove.bottom <= this.bottom) ||   // подход objMove снизу
+        (objMove.top < this.bottom && objMove.top >= this.top)) &&          // и сверху
+        ((objMove.right > this.left && objMove.right <= this.right) ||
+        (objMove.left >= this.left && objMove.left < this.right)))) {
+            //console.log('intersection');
             return true;
         }
-        
+
         // Один в другом.
-        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
-        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
-            console.log('inTo');
+        if ((objMove.top >= this.top && objMove.bottom <= this.bottom &&
+            objMove.right <= this.right && objMove.left >= this.left) ||
+        (this.top >= objMove.top && this.bottom <= objMove.bottom &&
+        this.right <= objMove.right && this.left >= objMove.left)) {
+            //console.log('inTo');
             return true;
         }
         
@@ -106,7 +126,7 @@ class Level {
 
         if (listActorsObj != undefined) {
             listActorsObj.forEach(i => {
-                if (i.type == 'player') {
+                if (i.type === 'player') {
                     this.player = i;
                 }
             });
@@ -136,11 +156,11 @@ class Level {
     }
 
     actorAt(objMove) {
-        if (this.actors == undefined) {
-            return undefined;
+        if (this.actors === undefined) {
+            return;
         }
         let result = undefined;
-        if (objMove == undefined || !(objMove instanceof Actor)) {
+        if (objMove === undefined || !(objMove instanceof Actor)) {
             throw new SyntaxError('Требуется объект типа Actor');
         } else {
             this.actors.forEach(i => {
@@ -166,18 +186,22 @@ class Level {
                 return 'lava';
             }
             // Проверка на пересечение с преградами.
-            // Обходим массив игрового поля, при нахождении неподвижной перграды, проверяем переданный объект
+            // Обходим массив игрового поля, при нахождении неподвижной перграды,
+            // проверяем переданный объект
             // на нахождение внутри границ преграды или ее пересечение.
             for (let yGrid = 0; yGrid < this.height; yGrid++) {
                 for (let xGrid = 0; xGrid < this.width; xGrid++) {
-                    if (this.grid[yGrid][xGrid] == 'wall' || this.grid[yGrid][xGrid] == 'lava') {
+                    if (this.grid[yGrid][xGrid] === 'wall' ||
+                    this.grid[yGrid][xGrid] === 'lava') {
         
-                        // Пересечение объекта с не целыми размерами или (и) позицией с преградой.
-                        if (((pos.y < yGrid + 1 && pos.y > yGrid) || (distObj.y < yGrid + 1 && distObj.y > yGrid)) &&
-                        ((pos.x < xGrid + 1 && pos.x > xGrid) || (distObj.x < xGrid + 1 && distObj.x > xGrid))) {
+            // Пересечение объекта с не целыми размерами или(и) позицией с преградой.
+                        if (((pos.y < yGrid + 1 && pos.y > yGrid) ||
+                        (distObj.y < yGrid + 1 && distObj.y > yGrid)) &&
+                        ((pos.x < xGrid + 1 && pos.x > xGrid) ||
+                        (distObj.x < xGrid + 1 && distObj.x > xGrid))) {
                             return this.grid[yGrid][xGrid];
                         }
-                        // Соприкосновение объекта с разных сторон препятствия или вложение (пересечение) его.
+            // Соприкосновение объекта с разных сторон препятствия или вложение (пересечение) его.
                         if ((xGrid >= pos.x && xGrid + 1 <= distObj.x && yGrid >= pos.y && yGrid + 1 <= distObj.y) || // вложение                                      //вложение
                         (xGrid < distObj.x && xGrid + 1 > pos.x && yGrid <= pos.y && yGrid + 1 >= distObj.y) || // подход объекта слева
                         (xGrid + 1 > pos.x && xGrid < pos.x && yGrid <= pos.y && yGrid + 1 >= distObj.y) ||     // подход объекта справа
@@ -196,39 +220,34 @@ class Level {
     }
 
     noMoreActors(typeObj) {
-        let flagTypeObj = false;
         if (this.actors != undefined) {
-            for (let i of this.actors) {
-                if (i.type == typeObj) {
-                    flagTypeObj = true;
+            for (let obj of this.actors) {
+                if (obj.type === typeObj) {
+                    return false;
                 }
             }
         }
-        if (!flagTypeObj) {
-            return true;
-        } else {
-            return false;
-        }
+        return true;
     }
 
     playerTouched(typeObj, obj) {
-        if (this.status == null) {
-            if (typeObj == 'lava' || typeObj == 'fireball') {
+        if (this.status === null) {
+            if (typeObj === 'lava' || typeObj === 'fireball') {
                 this.status = 'lost';
                 return;
             }
-            if (obj != undefined && obj.type == 'coin') {
+            if (obj != undefined && obj.type === 'coin') {
             let delObj = this.actors.indexOf(obj);
             this.actors.splice(delObj, 1);
+            
             for (let obj of this.actors) {
-                if (obj.type == 'coin') {
+                if (obj.type === 'coin') {
                     return;
                 }
             }
             this.status = 'won';
-            return;
+            }
         }
-    }
     }
 }
 
@@ -240,23 +259,22 @@ class LevelParser {
     actorFromSymbol(symb) {
         if (symb != undefined && symb in this.listObjGameArea) {
             return this.listObjGameArea[symb];
-        } else {
-            return undefined;
         }
+        return;
     }
 
     obstacleFromSymbol(symb) {
-        if (symb == 'x') {
+        if (symb === 'x') {
             return 'wall';
         }
-        if (symb == '!') {
+        if (symb === '!') {
             return 'lava';
         }
-        return undefined;
+        return;
     }
 
     createGrid(plan) {
-        if (plan.length == 0) {
+        if (plan.length === 0) {
             return [];
         } else {
             let resultList = [];
@@ -272,26 +290,25 @@ class LevelParser {
     }
 
     createActors(listObj) {
-        if (listObj.length == 0 || this.listObjGameArea == undefined) {
+        if (listObj.length === 0 || this.listObjGameArea === undefined) {
             return [];
-        } else {
-            let listMoveObj = [];
-            for (let i = 0; i < listObj.length; i++) {
-                for (let j = 0; j < listObj[i].length; j++) {
-                    let symb = listObj[i][j];
-                    let actorClass = this.actorFromSymbol(symb);
-                    if (actorClass != undefined && actorClass instanceof Function) {
-                        let newMoveObj = new Object (new actorClass());
-                        if (newMoveObj instanceof Actor) {
-                            newMoveObj.pos.x = j;
-                            newMoveObj.pos.y = i;
-                            listMoveObj.push(newMoveObj);
-                        }
+        }
+        let listMoveObj = [];
+        for (let i = 0; i < listObj.length; i++) {
+            for (let j = 0; j < listObj[i].length; j++) {
+                let symb = listObj[i][j];
+                let actorClass = this.actorFromSymbol(symb);
+                if (actorClass != undefined && actorClass instanceof Function) {
+                    let newMoveObj = new Object (new actorClass());
+                    if (newMoveObj instanceof Actor) {
+                        newMoveObj.pos.x = j;
+                        newMoveObj.pos.y = i;
+                        listMoveObj.push(newMoveObj);
                     }
                 }
             }
+        }
         return listMoveObj;
-    }
     }
 
     parse(plan) {
@@ -309,17 +326,21 @@ class Fireball extends Actor{
     }
 
     get type() {
-        let xxx = new HorizontalFireball();
         return 'fireball';
     }
 
     getNextPosition(t) {
         let time;
-        (t == undefined) ? time = 1 : time = t;
-        if (this.speed.x == 0 && this.speed.y == 0) {
+        if (t === undefined) {
+            time = 1;
+         } else {
+             time = t;
+         }
+        if (this.speed.x === 0 && this.speed.y === 0) {
             return new Vector(this.pos.x, this.pos.y);
         } else {
-            let result = new Vector(this.pos.x, this.pos.y).plus(new Vector(this.speed.x, this.speed.y).times(time));
+            let result = new Vector(this.pos.x, this.pos.y).plus(new Vector
+                (this.speed.x, this.speed.y).times(time));
             return result;
         }
     }
@@ -330,7 +351,11 @@ class Fireball extends Actor{
 
     act(t, gameLevel) {
         let nextPos = this.getNextPosition(t);
-        (gameLevel.obstacleAt(nextPos, this.size) == undefined) ? this.pos = nextPos : this.handleObstacle();
+        if (gameLevel.obstacleAt(nextPos, this.size) == undefined) {
+            this.pos = nextPos;
+        } else {
+            this.handleObstacle();
+        }
     }
 }
 
@@ -377,7 +402,11 @@ class Coin extends Actor {
 
     updateSpring(t) {
         let time;
-        (t == undefined) ? time = 1 : time = t;
+        if (t === undefined) {
+            time = 1;
+         } else {
+             time = t;
+            }
         this.spring += this.springSpeed * time;
     }
 
@@ -387,9 +416,14 @@ class Coin extends Actor {
 
     getNextPosition(t) {
         let time;
-        (t == undefined) ? time = 1 : time = t;
+        if (t === undefined) {
+            time = 1;
+         } else {
+             time = t;
+            }
         this.updateSpring(time);
-        let result = new Vector(this.pos.x, this.initPos.plus(this.getSpringVector()).y);
+        let result = new Vector(this.pos.x, this.initPos.plus
+            (this.getSpringVector()).y);
         return result;
     }
 
@@ -412,20 +446,20 @@ class Player extends Actor {
 
 
 const schemas = [
-    ['    v    ',
-    ' @       ',
+    ['  | v    ',
+    '@        ',
     '         ',
     '      oo',
     '      xxx',
-    '! !   |  ',
+    '         ',
     'xxx!     ',
     '         '],
     [
-    '    v v  ',
-    '         ',
+    '      v  ',
+    '    v    ',
     '  v      ',
     '        o',
-    '@       x',
+    '@      xx',
     '    x    ',
     'x        ',
     '         '
@@ -438,7 +472,7 @@ const actorDict = {
 'o': Coin,
 '|': VerticalFireball,
 '=': HorizontalFireball
-}
+};
 const parser = new LevelParser(actorDict);
 //const level = parser.parse(schema);
 //console.log(level.grid);
