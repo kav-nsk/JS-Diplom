@@ -76,12 +76,6 @@ class Actor {
             console.log('negative');
             return false;
         }
-        // Один в другом.
-        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
-        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
-            console.log('inTo');
-            return true;
-        }
         
         // Случаи частичного пересечения объектов.
         if (((objMove.right > this.left && objMove.right <= this.right) && (objMove.bottom >= this.bottom && objMove.bottom < this.top)) ||  // подход переданного объекта слева
@@ -91,6 +85,14 @@ class Actor {
             console.log('intersection');
             return true;
         }
+        
+        // Один в другом.
+        if ((objMove.top >= this.top && objMove.bottom <= this.bottom && objMove.right <= this.right && objMove.left >= this.left) ||
+        (this.top >= objMove.top && this.bottom <= objMove.bottom && this.right <= objMove.right && this.left >= objMove.left)) {
+            console.log('inTo');
+            return true;
+        }
+        
         return false;
     }
 }
@@ -411,11 +413,11 @@ class Player extends Actor {
 
 const schemas = [
     ['    v    ',
-    '@        ',
+    ' @       ',
     '         ',
     '      oo',
     '      xxx',
-    ' oo   |  ',
+    '! !   |  ',
     'xxx!     ',
     '         '],
     [
